@@ -1,0 +1,185 @@
+Utilizando el libro de google: Java Design Patterns,By Vaskaran Sarcar
+
+
+Explicaciones:
+
+*Adapter:
+Tip: usar un metodo existente, pero antes de llamarlo tengo que hacer una adecución, para eso uso la clase adaptadora
+La clase Adapter, es un un adaptador de una clase que quiero adaptar. Ejemplo si tengo la clase, 
+CalculadorSuperficies, cuyo metodo calcularArea  por parametro recibe 2 medidas en centimetros, y yo necesito implementar el mismo metodo
+pero que en ves de centimetros reciba pulgadas, dado que la formula es igual no copio y pego el codigo
+creo un clase adaptadora CalculadorSuperficiesAdapter, y en el metodo calcular area de la clase adaptadora
+primero convierto los parametro recibidos de pulgadas a centimetros y luego llamo al metodo original de la clase
+CalculadorSuperficies
+
+*Command:
+Tomemos como ejemplo un paint, hay un usuario(invocador), una consola(recibidor, el programa paint) y comandos (una interfaz con lo comun
+como seria un boton y varias implemantaciones) el usuario no conoce la consola o sea al receiver, solo conoce comandos y los ejecuta
+como los comandos al crearse reciben el receiver por parametro, saben donde ejecutarse y el estado del receiver en 
+cada momento, si un comando es "cambiar color" en todos los otros comandos tendran cambio de color en el receiver
+al aplicar un nuevo comando ya lo hace sobre el estado actual del receiver, lo basico
+El comoando conoce el receiver, el invoquer conoce el comando. Para guardar los estados usar patron memento
+Lo que me permite esto es definir comandos generales, ejemplo saludar y despedirce e implementar distintos receivers
+por ejemplo uno ingles y otro español y luego en cada uno estoy obligado a definir el comando, en mi impementacion
+cree una interfaz receiver para hacerlo mas prolijo
+
+*Iterator
+Me permitira recorrer un conjunto de datos y me independizo de lo que hay detras, ya sean colecciones, vectores
+etc. Entoces basicamente se crea una interfaz iterador que tendra metodos basicos de recorrido como, hasnext(),
+first(), isDone().
+Luego creo clases Iteradoras Concretas que implementenestos metodos y lidien con cada implementacion
+A las clases sujetos que son las que contienen las colecciones a recorrer le definimos una interfaz ISubject
+que obligue a implementar un metodo que devuelva su iterador, asi hacemos que cada clase sujeto, cree su iterador
+concreto y lo devuelva
+El iterator bien implementado, tiene que trabajar sobre una COPIA de la coleccion original, asi que cuando 
+recibo la coleccion en el constructor deberia crear una copia
+
+*Facade
+Es como un HELPER, el facade es una clase que yo voy a invocar para hacer algo, y esa clase a su vez 
+llama a otras clases que solo ella conoce para hacer el trabajo. Ejemplo para construir un robot llamo
+a la fachada y le paso el color y el material, y la fachada llama a clases que construyen brazos, cuerpos y piernas
+
+*Factory
+Esta claro que es una fabrica de objetos, una clase que tiene un metodo getInstance(type), yo lo llamo y me devuelve
+una instacia del objeto que especifico en type.
+en vez de tener ifs en cada creacion, solo una vez en la factory y listo.
+Tambien si quiero hacer algo muy pro puedo usar reflection
+
+*Abstract Factory
+Se llama asi por que la Abstract Factory es una clase abstracta para que no se pueda implemntar
+y su metodo es estatico asi lo podemos llamar, y lo que hace es cuando hacemos getInstance nos devuelve otra factory una comun
+y luego le volvemos hacer getInstance y nos da el objeto. Por ellos se la llama factory de factorys
+Es muy util en el acceso por ejemplo a base de datos, donde la abstract factory lee que tipo de persistencia usamos JDBC, hibernate, etc
+y de acuerdo a eso nos devuelve una factory para cada tipo de implmentacion, ejemplo LibroDAO (o sea para llegar al implementacion de LibroDAO 
+implementacion JPA, primero la abstract me da la factory de la familia jpa y luego la factory jpa la instacina LibroDAOJPA implmentacion)
+
+*Memento, aca 3 clases intervinen originator, seria la clase que origina los estados y necesita hacer el undo, ejemplo un block de notas
+luego la clase caretaker (esta clase simplemente guarda al objeto memento, es una clase con un objeto memento o una coleccion de tales elementos,
+que solo tiene los metodos get para devolverlo, o save para guardar el objeto y nada mas (solo get y save)
+Luego el objeto memento que tiene solamente los estados a guardar los seter y geter (y una particularidad, que tiene un constructor con parametros
+para inicializar las variables al crear el objeto
+El objeto originator es el que lleva la inteligencia. la cual consiste en el objeto devolverMemento: que el momento de llamar a este metodo
+es cuando tengo que crear el objeto memento pasando las propiedades por parametro y guardarlo en la instancia del originator
+
+Resumen:
+Originator: propiedades: variables y un ojbeto mement, constructor vacio, solo seters, metodo Memento originatorMemento() que hace el new del memento con los estados del originator, lo guarda en propiedad interna, y undo(Memento m) pisa propiedades con las del memento guardado
+CareTaker: prpiedades: solo un objeto memento, seter y geters
+Memento: propiedades: las mismas que el originator, constructor con propiedades, solo geters()!!!
+
+State:
+Aca a destacar es que cada estado sabe a que estado combiar y se encarga de hacerlo
+2 actores:
+El que sufre los estados en mi ejemplo la TV, propiedades un estado (se inicializa con estado inicial), construrctor(recibe estado inicial por parametro) metodos cambiar estado, y getEstado
+La interfaz de estados (en mi caso IRemoteControl: Tiene un metodo cambiarEstado(Al que sufre los cambios de estado), o sea recibe al que lugar donde los cambios de estado se producen ejemplo un workflow
+Y sus implementaciones (en mi ejemplo on y off), luego en cada implementacion concreta de un estado, cuando se ejecuta cambiar estado, tomo el contexto (ej workflow) y le cambio el objeto estado por el nuevo estado
+Beneficio, 
+Puedo agregar nuevos estados, y la logica de pasar de estados a otro la sabe cada estado
+
+
+Builder: 
+Es un patron raro, hay 3 actores
+Director, es el encargado de ejecutar la construccion de un objeto, propiedades: objeto a construir, constructor vacio, metodo construir(Ibuilder =objeto concreto a construir)
+Las implementaciones de IBuilder (el nombre correcto seria "Constructor" los objetos que implementan esta interfaz son construibles, propiedades producto, constructor vacio, medotos de construccion, y el getProducto
+Producto: propiedades: una coleccion de partes, metodos para agregar partes y para mostrar el producto
+Explicacion: 
+    El objeto PRODUCTO, es el producto en realidad, dado que producto es una coleccion de parteS que forman el producto
+    El objeto concreto Auto implementacion de IBuilder, es un objeto de COMPORTAMIENTO, no SABE COMO ARMAR EL PRODUCTO, Y como devolver un producto terminado
+    El objeto director, solo conoce a los Armadores de productos, ejecuta los metodos de armado, y nada mas, luego que el director ejecuto el armado, se le pide por ultimo el producto al objeto armador
+    Director --->Ibuilder (implementaciones concretas): Les pide que se armen
+    IBuilder--->Productos va formando el producto, y por ultimo le pide que se muestre
+    Producto, no envia mensajes a nadie
+Este patron esta muy bueno para objetos que se arman x ej como bloquues de rustys, entonces, el produto
+es una coleccion de rustys, y cada objeto los coloca depende que deba formar
+Otro uso puede ser que el producto tenga una matriz, y lo productos sean distintos mapas de bits
+
+FlyWeight:
+Bueno es muy parecido a un singleton, la idea es que hay cosas como la clase en si misma, que se denominan intrinsicas
+esas cosas no se pueden compartir y hay que crear un objeto por cada tipo de caracteristica intrinseca
+La otras propiedades son extrinsecas entonces no es necesario crear objetos nuevos, si no que cambio en el objeeto la propiedad extrinsica por el nuevo valor
+En mi ejemplo:
+Intrinsecas: LargeRobot o SmallRobot
+Extrinsecas: Color
+Entonces, se crean solo 2 instancias de objetos (large y small)
+Y Luego lo que hago es tomar uno de estos objetos, cambiarle el color imprimir, y si necesito imprimir con otro color
+tomo el mismo objeto le seteo un nuevo color  vuelvo a imprimir
+De esta forma creo solo 2 objetos y ahorro memorio
+
+
+Mediator:
+Bueno esto es un mediador para romper una comunicacion muchos a muchos, y poner un objeto que unifique comunicacion entre objetos
+Vamos a tener: interfaz Mediator y su implemntador
+Los ojbetos que necesitan mediacion que tinen una superclase
+Claves:
+Superclase AMediar: constructo con mediator, y metodo de comunicacion
+Objetos Amediar, usan la instancia de medidador y su metodo comunicar
+El mediador: constructor vacio que inicia una coleccion, coleccion de objetos AMediar, metodo comunicar, y metodo addAMediar
+Util, si por ejemplo tengo que modelar aviones y torre de control(seria el mediator) y los aviones para manda un mensaje a otro,
+lo harian usando la torre de control
+
+Chain of responsability:
+Bueno aca hay 3 grupos de actores:
+Eslabones de la cadena o Recibidores
+El pedidor: el que contacta a la cadena
+Los demandantes: los que tienen envios para procesar
+*Podriamos crear un cuarto El Mensaje o Request (que es lo que enviamos para validar)
+
+Esto funciona asi:
+El pedidor tiene: una instancia de un Eslabon de cadena (va en su constructor), un metodo enviarPedido
+Los eslabones: una instancia de otro eslabon, pasa por constructor, metodo procesar pediido (este si no puede llama al procesar pedido del siguiente eslabon, esto forma la cadena)
+Listo, asi funciona
+
+Nota: yo implementaria la cadena como una coleccion dentro del pedidor,
+
+Composite:
+Bueno es el patron para modelar un Arbol: tiene 2 elementos
+La interfaz IComponent, con metodos: addHijo, removeHijo, getHijos
+La implementacion del Componente: propiedades: Colleccion de hijos tips IComponent, otras inerentes al caso como String de Nombre
+
+Sirve para implementar un arbol.
+
+Bridge:
+Rompe una relacion muchos a muchos, genera 2 abstracciones, y hacemos que la relacion se vuelva una abstraccion hacia otra abstraccion,
+asi se corta la relacion.
+Luego me quedan 2 grupos de clases, las abstracciones y los implementer. Las clases del grupo Abrstraccion tienen una referencia al gruupo implemntador
+Grupos:
+Clase Abstraccion, propiedades: Objeto implementador, constructor(Recibe obj implementador), metodos que usan el obj implmentador
+Implementador: Libre hace operaciones
+
+
+
+Interpreter:
+Un uso practico, es mandar un String con una ecuación y resolverlo
+Se usa para especificar una legunaje, su sintaxis y luego interpretarlo. Pueden ser Ecuaciones, idiomas, lenguajes programacion
+Otra utilidad es producir varios tipos de output a partir de una fuente, ejemplo bits o string, otro es un reporte con distintos ordenes
+Tomemos un calculo de matematica:
+Hay 2 grupos de clases, tipos de elementos  y el interpreter
+*Opcional: una clase que  funciona como repositorio se llama Contexto y es lo que mandaria a interpretar
+*El interpreter: tiene las reglas para interpretr las combinaciones de clases elementos o expresiones
+*Las clases elementos o Expresiones: son bloques para armar una sentencia,deben implementar el metodo evalauete o interpret, de esta forma cada expsion sabe que devolver si le pido evaluarse
+
+Entonces una sentencia sera una combinacion 
+de instancias de distintos elementos, y el interpretador sabe como interpretarlo, tiene dentro cargada las reglas
+A veces puede pasar que la expresion viene como String y el interpreter tambien tiene la responsabilidad de saber comvertir esa cadena a una coleccion de elementos, y luego recorrerla para mandar obtener el resultado
+
+
+Visitor:
+Aplica para una api donde a la api donde me quiero conectar es OriginalInterface, y mi programa el visitador
+Primero la api acepta mi visita, eso se hace con usuario y pass
+Luego puedo operar desde la clase visitor
+Clase a visitar o externa: Cuando accepta al visitador, ejecuta el metodo visitar(y se paso como parametro)
+Visitador: Cuando es aceptado la clase externa ejecuta los metodos del visitador. Esta es la clave del patron se ejecutan los metodos solo si ClaseExterna ejecuta ACCEPT
+Esta bien explicado aca: http://buenaspracticasupc.blogspot.com/2016/04/patron-visitor.html
+Funciona bien si yo tengo una coleccion de elementos a Visitar y los voy recorriendo aplicando visit, y si yo declare, varios metodos
+con overloading (not overriding), de visit(claseConcreta1, claseConcreta2, etc), me va a ir aplicando distintos metodos a cada clase concreta
+Se puede ver de dos modos sindo mi programa el visitador y el cliente una api, yo en el metodo accept(visitor de el), yo lo ejecutaria y tambien le pasaria un usuario y pasword, donde si el me acepta como visitador, 
+sabe que tiene que ejecutar mi metodo visit, donde yo lo tomo a el y hago alguna cosa, pero como ya pase el if de usuario y pass
+es seguro para el que yo haga la operacion
+El enroque es este el cliente me acepata accept(Visitor){visitor.visit(this)} y mi metodo en el visitor es visit(Cliente){cliente.metodoDelCliente(), ej: actualizarPantalla()}
+O sea lo que hace el visitador es ejecutar una operacion del cliente, solo si el cliente acepta al visitador, y esto sirver para 
+por ejemplo ir definiendo distintos clientes, y dentro del objeto visitador agrego metodos, luego en un bucle, recorro una coleccion de objetos clientes, y led digo cliente.accept(visitor) y ejecuta todas las operaciones
+O si quiero definir una clase visitador, que cuando el cliente me acepta como visita, y luego yo ejecuto mi propio metodo visit, hago diferentes operaciones dependiendo la clase concreta del cliente
+La clase que queremos que reciba los eventos deberá implementar la interfaz Observer y el objeto que queremos que produzca los eventos debe extender o contener una propiedad de tipo Observable
+URL:https://picodotdev.github.io/blog-bitix/2015/10/el-patron-de-diseno-observer-y-una-forma-de-implementarlo-en-java/
+
+
+Prototype: no lo desarrolle aca, pero consiste en implementar el metodo clone y negerar objetos a partir de uno modelo

@@ -1,0 +1,7 @@
+La clase Adapter, es un un adaptador de una clase que quiero adaptar. Ejemplo si tengo la clase, 
+CalculadorSuperficies, cuyo metodo calcularArea  por parametro recibe 2 medidas en centimetros, y yo necesito implementar el mismo metodo
+pero que en ves de centimetros reciba pulgadas, dado que la formula es igual no copio y pego el codigo
+creo un clase adaptadora CalculadorSuperficiesAdapter, y en el metodo calcular area de la clase adaptadora
+primero convierto los parametro recibidos de pulgadas a centimetros y luego llamo al metodo original de la clase
+CalculadorSuperficies
+
