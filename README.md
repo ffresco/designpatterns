@@ -8,7 +8,7 @@ El proyecto es para le IDE Netbeans 8.1
 
 ### Instalación 🔧
 
-
+git clone https://github.com/ffresco/designpatterns.git
 
 ## Ejecutando las pruebas ⚙️
 
